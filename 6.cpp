@@ -1,55 +1,37 @@
-#include <DHT.h>
-#include <LiquidCrystal_I2C.h>
-#include <Wire.h>
-
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-
+#include "DHT.h"
 #define DHTPIN 2
 #define DHTTYPE DHT11
-#define LEDPIN 7    
+#define LEDPIN 13
+#define TEMP_THRESHOLD 20
 
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
   Serial.begin(9600);
   dht.begin();
-  lcd.init();
-  lcd.backlight();
   pinMode(LEDPIN, OUTPUT);
 }
 
 void loop() {
-  float h = dht.readHumidity();
-  float t = dht.readTemperature();
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
 
-  if (isnan(h) || isnan(t)) {
+  if (isnan(temperature) || isnan(humidity)) {
     Serial.println("Failed to read from DHT sensor!");
-    lcd.setCursor(0, 0);
-    lcd.print("Sensor Error   ");
     return;
   }
 
-  Serial.print("Humidity: ");
-  Serial.print(h);
-  Serial.print(" %, Temp: ");
-  Serial.print(t);
-  Serial.println(" °C");
+  Serial.print("Temperature: ");
+  Serial.print(temperature);
+  Serial.print(" °C, Humidity: ");
+  Serial.print(humidity);
+  Serial.println(" %");
 
-  lcd.setCursor(0, 0);
-  lcd.print("Temp: ");
-  lcd.print(t);
-  lcd.print("C  ");
-
-  lcd.setCursor(0, 1);
-  lcd.print("Hum: ");
-  lcd.print(h);
-  lcd.print("%  ");
-
-  if (t > 30) {   
+  if (temperature > TEMP_THRESHOLD) {
     digitalWrite(LEDPIN, HIGH);
   } else {
     digitalWrite(LEDPIN, LOW);
   }
 
-  delay(1000);
+  delay(2000);
 }

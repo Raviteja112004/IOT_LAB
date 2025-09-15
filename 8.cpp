@@ -1,34 +1,44 @@
-#define bpin 8
-#define tpin 9
-#define epin 10
+// Pin assignments
+const int trigPin = 10;
+const int echoPin = 9;
+const int buzzerPin = 8;
+
+// Distance threshold in cm
+const int thresholdDistance = 20;
 
 void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(buzzerPin, OUTPUT);
   Serial.begin(9600);
-  pinMode(epin, INPUT);
-  pinMode(bpin, OUTPUT);
-  pinMode(tpin, OUTPUT);
 }
 
 void loop() {
-  float duration, distance;
-  digitalWrite(tpin, LOW);
+  long duration;
+  float distance;
+
+  // Send ultrasonic pulse
+  digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
-  digitalWrite(tpin, HIGH);
+  digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
-  digitalWrite(tpin, LOW);
+  digitalWrite(trigPin, LOW);
 
-  duration = pulseIn(epin, HIGH);
-  distance = duration / 58.2;
+  // Read echo
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.0343 / 2; // Convert to cm
 
-  Serial.print("Distance = ");
+  // Print distance
+  Serial.print("Distance: ");
   Serial.print(distance);
-  Serial.print("\n");
+  Serial.println(" cm");
 
-  if(distance < 50) {
-    tone(bpin, 1000);
-  } else {  
-    noTone(bpin);
+  // Check distance
+  if (distance > 0 && distance < thresholdDistance) {
+    digitalWrite(buzzerPin, HIGH); // Object too close
+  } else {
+    digitalWrite(buzzerPin, LOW);  // Safe
   }
-  delay(250);
-}
 
+  delay(200); // Small delay to stabilize readings
+}

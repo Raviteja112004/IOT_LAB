@@ -1,33 +1,20 @@
+const int ledPin = 13;
+const int ldrPin = A0;
+
 void setup() {
-  pinMode(9, OUTPUT);
-  pinMode(A0, INPUT);
   Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);
+  pinMode(ldrPin, INPUT);
 }
 
 void loop() {
-  int val = analogRead(A0);
-  digitalWrite(9, ((val > 128) ? HIGH : LOW));
-  delay(1000);
-}
-
-void setup() {
-  pinMode(9, OUTPUT);
-  pinMode(A0, INPUT);
-  Serial.begin(9600);
-}
-//using only analog read and analogwrite
-void loop() {
-  int val = analogRead(A0);  // val ranges from 0 to 1023
-
-  // Map the analog read value (0-1023) to PWM range (0-255)
-  int pwmVal = map(val, 0, 1023, 0, 255);
-
-  analogWrite(9, pwmVal);
-
-  Serial.print("Analog Value: ");
-  Serial.print(val);
-  Serial.print(" => PWM Output: ");
-  Serial.println(pwmVal);
-
-  delay(1000);
+  int ldrStatus = analogRead(ldrPin);
+   if (ldrStatus <=300) {
+    digitalWrite(ledPin, HIGH);
+    Serial.println("LDR is DARK, LED is ON");
+   }
+  else {
+    digitalWrite(ledPin, LOW);
+    Serial.println("LDR is BRIGHT, LED is OFF");
+  }
 }
